@@ -72,6 +72,10 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
 
+    implementation(libs.tensorflow.lite.v2150)
+    implementation(libs.tensorflow.lite.gpu)
+    implementation(libs.tensorflow.lite.support)
+
     // Koin
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.android)
