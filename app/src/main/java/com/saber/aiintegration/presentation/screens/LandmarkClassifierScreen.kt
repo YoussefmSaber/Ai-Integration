@@ -10,15 +10,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,117 +37,96 @@ import com.saber.aiintegration.domain.Classification
 import com.saber.aiintegration.presentation.componants.CameraPreview
 import com.saber.aiintegration.presentation.componants.CurrentModelDropDown
 import com.saber.aiintegration.presentation.componants.DetectedLandmarkTitle
+import com.saber.aiintegration.presentation.viewmodels.LandmarkClassifierViewModel
 import com.saber.aiintegration.utils.LandmarkImageAnalyzer
 import com.saber.aiintegration.utils.icons.Iconly
 import com.saber.aiintegration.utils.icons.iconly.Camera
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 
 @Composable
-fun LandmarkClassifierScreen(applicationContext: Context) {
+fun LandmarkClassifierScreen(context: Context = LocalContext.current) {
+    // ViewModel and dependencies
+    val viewModel: LandmarkClassifierViewModel =
+        koinViewModel(parameters = { parametersOf(context) })
+    val modelManager: ModelManager = koinInject { parametersOf(context) }
+
+    // Observables
+    val availableModels by viewModel.availableModels.collectAsState()
+    val selectedModel by viewModel.selectedModel.collectAsState()
+
     // State for classification results
     var classification by remember { mutableStateOf(emptyList<Classification>()) }
 
-    // State for selected model
-    var selectedModel by remember { mutableStateOf("") }
-
-    // Initialize ModelManager
-    val modelManager = remember { ModelManager(applicationContext) }
-
-    // State for available models
-    var availableModels by remember { mutableStateOf(emptyList<String>()) }
-
-    // Retrieve downloaded models
-    LaunchedEffect(Unit) {
-        availableModels = modelManager.getDownloadedModels()
-        if (availableModels.isNotEmpty()) {
-            selectedModel = availableModels.first() // Default to the first available model
-        }
-    }
-
-    // Create the analyzer with the selected model
-    val analyzer = remember(applicationContext, selectedModel) {
+    // Create analyzer and controller
+    val analyzer = remember(viewModel, selectedModel) {
         LandmarkImageAnalyzer(
-            classifier = TfLiteLandmarkClassifier(
-                context = applicationContext,
-                modelManager
-            ),
-            location = selectedModel, // Pass the selected model here
-            onResults = { results ->
-                classification = results
-            }
+            classifier = TfLiteLandmarkClassifier(context, modelManager),
+            location = selectedModel,
+            onResults = { results -> classification = results }
         )
     }
 
     val controller = remember {
-        LifecycleCameraController(applicationContext).apply {
+        LifecycleCameraController(context).apply {
             setEnabledUseCases(CameraController.IMAGE_ANALYSIS or CameraController.IMAGE_CAPTURE)
-            setImageAnalysisAnalyzer(
-                ContextCompat.getMainExecutor(applicationContext),
-                analyzer
-            )
+            setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context), analyzer)
         }
     }
 
-    // UI Layout
+    // Main Layout
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        BasicText(
-            text = "Center the object inside the square",
-            style = TextStyle(
-                fontSize = 16.sp
-            )
-        )
-
-        Spacer(Modifier.height(64.dp))
-
-        // Camera Preview
-        CameraPreview(
-            controller = controller,
-            modifier = Modifier
-                .height(350.dp)
-                .width(350.dp)
-                .clip(RoundedCornerShape(25.dp))
-        )
-
+        InstructionsText()
         Spacer(Modifier.height(32.dp))
-
-        // Detected Landmark Title
-        val landmark = classification.firstOrNull()?.label ?: "No landmark detected"
-        DetectedLandmarkTitle(landmark)
-
+        CameraPreview(controller = controller, modifier = Modifier.cameraPreviewStyle())
         Spacer(Modifier.height(32.dp))
+        DetectedLandmarkTitle(classification.firstOrNull()?.label ?: "No landmark detected")
+        Spacer(Modifier.height(32.dp))
+        ActionRow(
+            availableModels = availableModels,
+            onSelectModel = { model -> viewModel.selectModel(model) }
+        )
+    }
+}
 
-        // Floating Action Button and Dropdown Row
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
+@Composable
+private fun InstructionsText() {
+    BasicText(text = "Center the object inside the square", style = TextStyle(fontSize = 16.sp))
+}
+
+@Composable
+private fun Modifier.cameraPreviewStyle(): Modifier = this
+    .size(300.dp)
+    .clip(RoundedCornerShape(25.dp))
+
+@Composable
+private fun ActionRow(
+    availableModels: List<String>,
+    onSelectModel: (String) -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        FloatingActionButton(
+            shape = CircleShape,
+            onClick = { /* Optional: Add functionality here */ }
         ) {
-            FloatingActionButton(
-                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(
-                    defaultElevation = 0.dp
-                ),
-                shape = CircleShape,
-                onClick = {
-                    // Optional: Trigger additional functionality, like capturing an image
-                }
-            ) {
-                Icon(Iconly.Camera, contentDescription = "Camera Button")
-            }
-
-            Spacer(Modifier.width(16.dp))
-
-            // Model Dropdown
-            CurrentModelDropDown(
-                availableModels = availableModels,
-                getCurrentModel = { model -> selectedModel = model },
-                modifier = Modifier.width(150.dp)
-            )
+            Icon(Iconly.Camera, contentDescription = "Camera Button")
         }
+
+        Spacer(Modifier.width(16.dp))
+
+        CurrentModelDropDown(
+            availableModels = availableModels,
+            getCurrentModel = onSelectModel,
+            modifier = Modifier
+        )
     }
 }
 
