@@ -24,26 +24,14 @@ class ModelManager(private val context: Context) {
     }
 
     /**
-     * Retrieves the file path of a model if it exists.
+     * Ensures that the specified model is available locally. If the model is not available,
+     * it downloads the model from the provided URL.
      *
-     * @param modelName The name of the model.
-     * @return The file path of the model, or null if it does not exist.
+     * @param modelName The name of the model to check or download.
+     * @param modelUrl The URL to download the model from if it is not available locally.
+     * @param onDownloadComplete Callback function to be invoked when the model is available.
+     *                           The callback receives a Boolean indicating success and the File object of the model.
      */
-    fun getModelPath(modelName: String): File? {
-        val models = mapOf(
-            "Europe" to "landmarks-europe.tflite",
-            "Asia" to "landmarks-asia.tflite",
-            "Africa" to "landmarks-africa.tflite",
-            "North America" to "landmarks-north-america.tflite",
-            "South America" to "landmarks-south-america.tflite",
-            "Oceania" to "landmarks-oceania-antarctica.tflite",
-        )
-        val modelFile = models[modelName]?.let { File(modelDirectory, it) }
-        return if (modelFile != null) {
-            if (modelFile.exists()) modelFile else null
-        } else null
-    }
-
     fun ensureModelAvailable(
         modelName: String,
         modelUrl: String,
@@ -75,7 +63,11 @@ class ModelManager(private val context: Context) {
      * @param modelUrl The URL to download the model from.
      * @param onDownloadComplete Callback function to be invoked when the download is complete.
      */
-    fun downloadModel(modelName: String, modelUrl: String, onDownloadComplete: (Boolean) -> Unit) {
+    private fun downloadModel(
+        modelName: String,
+        modelUrl: String,
+        onDownloadComplete: (Boolean) -> Unit
+    ) {
         val modelFile = File(modelDirectory, modelName)
 
         val request = Request.Builder()
@@ -101,18 +93,5 @@ class ModelManager(private val context: Context) {
                 onDownloadComplete(true)
             }
         })
-    }
-
-    /**
-     * Deletes models from the model directory that are not in the list of models to keep.
-     *
-     * @param keepModels A list of model names to keep.
-     */
-    fun clearUnusedModels(keepModels: List<String>) {
-        modelDirectory.listFiles()?.forEach { file ->
-            if (!keepModels.contains(file.nameWithoutExtension)) {
-                file.delete()
-            }
-        }
     }
 }

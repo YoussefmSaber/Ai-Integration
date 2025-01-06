@@ -23,34 +23,22 @@ class TfLiteLandmarkClassifier(
     private var currentModel: String? = null
 
     private val models = mapOf(
-        "Europe" to "https://drive.google.com/file/d/1BNRTjgMbEJYQ0dDRWJpNj8ChDWUWqmfj/view?usp=sharing",
-        "Asia" to "https://drive.google.com/file/d/1N6ol2Rj1PhC5dsv9Dumznx6Va_CZtc5S/view?usp=sharing",
-        "Africa" to "https://drive.google.com/file/d/1Gvwq5aOI1vr0CCvfiB0NidsXcC2ptD8C/view?usp=sharing",
-        "North America" to "https://drive.google.com/file/d/1hSvrBH5Ysi9g5sbfQkZk7aWBHixoIfNG/view?usp=sharing",
-        "South America" to "https://drive.google.com/file/d/1Fzo15xUdFemTtxqPUUfm8OgzRjfCht7V/view?usp=sharing",
-        "Oceania" to "https://drive.google.com/file/d/1v0x1uvpsez4wQcoMRDboBSCtpDFqgpM3/view?usp=sharing",
+        "Europe" to "https://drive.usercontent.google.com/u/0/uc?id=1BNRTjgMbEJYQ0dDRWJpNj8ChDWUWqmfj&export=download",
+        "Asia" to "https://drive.usercontent.google.com/u/0/uc?id=1N6ol2Rj1PhC5dsv9Dumznx6Va_CZtc5S&export=download",
+        "Africa" to "https://drive.usercontent.google.com/u/0/uc?id=1Gvwq5aOI1vr0CCvfiB0NidsXcC2ptD8C&export=download",
+        "North America" to "https://drive.usercontent.google.com/u/0/uc?id=1hSvrBH5Ysi9g5sbfQkZk7aWBHixoIfNG&export=download",
+        "South America" to "https://drive.usercontent.google.com/u/0/uc?id=1Fzo15xUdFemTtxqPUUfm8OgzRjfCht7V&export=download",
+        "Oceania" to "https://drive.usercontent.google.com/u/0/uc?id=1v0x1uvpsez4wQcoMRDboBSCtpDFqgpM3&export=download",
     )
 
     private fun setupClassifier(modelName: String, onDownloadComplete: (Boolean) -> Unit) {
-        val modelPath = modelManager.getModelPath(modelName)
-
-        if (modelPath != null) {
-            loadModel(modelPath.absolutePath)
-            onDownloadComplete(true)
-            return
-        }
-
         val modelUrl = models[modelName] ?: return onDownloadComplete(false)
 
-        modelManager.downloadModel(modelName, modelUrl) { success ->
-            if (success) {
-                val downloadedModelPath = modelManager.getModelPath(modelName)?.absolutePath
-                if (downloadedModelPath != null) {
-                    loadModel(downloadedModelPath)
-                    onDownloadComplete(true)
-                }
-                onDownloadComplete(true)
+        modelManager.ensureModelAvailable(modelName, modelUrl) { success, modelFile ->
+            if (success && modelFile != null) {
+                loadModel(modelFile.absolutePath)
             }
+            onDownloadComplete(success)
         }
     }
 
