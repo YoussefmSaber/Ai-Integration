@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.view.CameraController
@@ -24,27 +25,44 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.saber.aiintegration.data.manager.TfLiteLandmarkClassifier
 import com.saber.aiintegration.domain.Classification
 import com.saber.aiintegration.presentation.componants.CameraPreview
+import com.saber.aiintegration.presentation.screens.HomeScreen
+import com.saber.aiintegration.presentation.screens.OnboardingScreen
 import com.saber.aiintegration.utils.LandmarkImageAnalyzer
 import com.saber.aiintegration.ui.theme.AiIntegrationTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.BLACK)
+        )
         if (!hasCameraPermission()) {
             ActivityCompat.requestPermissions(
                 this, arrayOf(Manifest.permission.CAMERA), 0
             )
         }
         setContent {
-            AiIntegrationTheme {
-//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            AiIntegrationTheme() {
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = Color.White
+                ) { innerPadding ->
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
+                        OnboardingScreen()
+                    }
+                }
 //                    var classification by remember {
 //                        mutableStateOf(emptyList<Classification>())
 //                    }

@@ -1,10 +1,12 @@
 package com.saber.aiintegration.presentation.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,12 +27,15 @@ fun OnboardingScreen(
     onClickNavigate: () -> Unit = {}
 ) {
 
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         val (content, button) = createRefs()
 
         PlaceholderItem(
             ONBOARDING_TEXT,
-            R.drawable.world_pana,
+            R.drawable.onboarding,
             ONBOARDING_DESC,
             modifier = Modifier
                 .padding(16.dp)

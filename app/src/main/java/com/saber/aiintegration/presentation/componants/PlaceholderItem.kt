@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,7 +34,10 @@ fun PlaceholderItem(
     ) {
         Image(
             painter = painterResource(placeholderImage),
-            contentDescription = placeholderDescription
+            contentDescription = placeholderDescription,
+            modifier = Modifier
+                .width(350.dp)
+                .height(350.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
