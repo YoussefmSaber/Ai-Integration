@@ -8,6 +8,7 @@ kotlin = "2.1.0"
 coreKtx = "1.15.0"
 composeBom = "2024.12.01"
 koinVersion = "4.0.0"
+okhttp = "4.10.0"
 roomRuntime = "2.6.1"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -59,6 +60,7 @@ koin-ksp = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-an
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 #tensorflow
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 tensorflow-lite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tensorflowLiteGpu" }
 tensorflow-lite-gpu-delegate-plugin = { module = "org.tensorflow:tensorflow-lite-gpu-delegate-plugin", version.ref = "tensorflowLiteGpuDelegatePlugin" }
 tensorflow-lite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", version.ref = "tensorflowLiteTaskVision" }

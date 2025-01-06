@@ -92,6 +92,9 @@ dependencies {
     // Kotlin serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // OkHttp
+    implementation(libs.okhttp)
+
     // Koin
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.android)
