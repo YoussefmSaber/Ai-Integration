@@ -44,6 +44,30 @@ class ModelManager(private val context: Context) {
         } else null
     }
 
+    fun ensureModelAvailable(
+        modelName: String,
+        modelUrl: String,
+        onDownloadComplete: (Boolean, File?) -> Unit
+    ) {
+        val models = mapOf(
+            "Europe" to "landmarks-europe.tflite",
+            "Asia" to "landmarks-asia.tflite",
+            "Africa" to "landmarks-africa.tflite",
+            "North America" to "landmarks-north-america.tflite",
+            "South America" to "landmarks-south-america.tflite",
+            "Oceania" to "landmarks-oceania-antarctica.tflite",
+        )
+        val modelFile = models[modelName]?.let { File(modelDirectory, it) }
+        if (modelFile?.exists() == true) {
+            onDownloadComplete(true, modelFile)
+            return
+        }
+
+        downloadModel(modelName, modelUrl) { sucess ->
+            onDownloadComplete(sucess, if (sucess) modelFile else null)
+        }
+    }
+
     /**
      * Downloads a model from a given URL and saves it to the model directory.
      *
@@ -53,11 +77,6 @@ class ModelManager(private val context: Context) {
      */
     fun downloadModel(modelName: String, modelUrl: String, onDownloadComplete: (Boolean) -> Unit) {
         val modelFile = File(modelDirectory, modelName)
-
-        if (modelFile.exists()) {
-            onDownloadComplete(true)
-            return
-        }
 
         val request = Request.Builder()
             .url(modelUrl)
