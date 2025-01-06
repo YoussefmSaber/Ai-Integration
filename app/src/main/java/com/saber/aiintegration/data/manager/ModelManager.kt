@@ -94,4 +94,27 @@ class ModelManager(private val context: Context) {
             }
         })
     }
+
+    /**
+     * Retrieves the list of downloaded models available in the models directory.
+     *
+     * @return A list of model names corresponding to the downloaded files.
+     */
+    fun getDownloadedModels(): List<String> {
+        val models = mapOf(
+            "Europe" to "landmarks-europe.tflite",
+            "Asia" to "landmarks-asia.tflite",
+            "Africa" to "landmarks-africa.tflite",
+            "North America" to "landmarks-north-america.tflite",
+            "South America" to "landmarks-south-america.tflite",
+            "Oceania" to "landmarks-oceania-antarctica.tflite",
+        )
+
+        return modelDirectory.listFiles()
+            ?.filter { it.isFile && it.extension == "tflite" } // Filter for .tflite files
+            ?.map { file ->
+                // Reverse map the filename to the model name
+                models.entries.firstOrNull { it.value == file.name }?.key ?: file.name
+            } ?: emptyList()
+    }
 }

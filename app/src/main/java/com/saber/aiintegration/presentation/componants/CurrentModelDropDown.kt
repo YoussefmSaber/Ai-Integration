@@ -1,5 +1,6 @@
 package com.saber.aiintegration.presentation.componants
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
@@ -36,10 +37,12 @@ fun CurrentModelDropDown(
     ) {
         TextField(
             value = selectedOption.value,
-            modifier = modifier.menuAnchor(
-                type = MenuAnchorType.PrimaryNotEditable,
-                enabled = true
-            ),
+            modifier = modifier
+                .menuAnchor(
+                    type = MenuAnchorType.PrimaryNotEditable,
+                    enabled = true
+                )
+                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(12.dp)),
             shape = RoundedCornerShape(12.dp),
             onValueChange = {},
             readOnly = true,
