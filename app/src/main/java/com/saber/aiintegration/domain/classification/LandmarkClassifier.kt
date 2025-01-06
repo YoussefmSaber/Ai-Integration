@@ -1,4 +1,4 @@
-package com.saber.aiintegration.domain
+package com.saber.aiintegration.domain.classification
 
 import android.graphics.Bitmap
 

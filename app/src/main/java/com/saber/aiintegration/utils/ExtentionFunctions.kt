@@ -1,11 +1,14 @@
 package com.saber.aiintegration.utils
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import java.io.ByteArrayOutputStream
 
 /**
  * Applies a fading edge effect to a composable using a specified brush.
@@ -37,3 +40,13 @@ fun Modifier.fadingEdge(brush: Brush) = this
          */
         drawRect(brush = brush, blendMode = BlendMode.Darken, alpha = 0.5F)
     }
+
+fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream) // Or JPEG, based on your preference
+    return stream.toByteArray()
+}
+
+fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
+    return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+}

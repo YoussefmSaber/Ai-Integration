@@ -1,6 +1,12 @@
 package com.saber.aiintegration.presentation.screens
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.util.Log
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.saber.aiintegration.data.manager.ModelManager
 import com.saber.aiintegration.data.manager.TfLiteLandmarkClassifier
-import com.saber.aiintegration.domain.Classification
+import com.saber.aiintegration.domain.classification.Classification
 import com.saber.aiintegration.presentation.componants.CameraPreview
 import com.saber.aiintegration.presentation.componants.CurrentModelDropDown
 import com.saber.aiintegration.presentation.componants.DetectedLandmarkTitle
@@ -92,7 +99,13 @@ fun LandmarkClassifierScreen(context: Context = LocalContext.current) {
         Spacer(Modifier.height(32.dp))
         ActionRow(
             availableModels = availableModels,
-            onSelectModel = { model -> viewModel.selectModel(model) }
+            onSelectModel = { model -> viewModel.selectModel(model) },
+            onPhotoClick = {
+                takePhoto(controller, context) { bitmap ->
+                    viewModel.saveLandmark("Landmark", bitmap)
+
+                }
+            }
         )
     }
 }
@@ -110,12 +123,14 @@ private fun Modifier.cameraPreviewStyle(): Modifier = this
 @Composable
 private fun ActionRow(
     availableModels: List<String>,
-    onSelectModel: (String) -> Unit
+    onSelectModel: (String) -> Unit,
+    onPhotoClick: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         FloatingActionButton(
             shape = CircleShape,
-            onClick = { /* Optional: Add functionality here */ }
+            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp),
+            onClick = onPhotoClick
         ) {
             Icon(Iconly.Camera, contentDescription = "Camera Button")
         }
@@ -125,8 +140,42 @@ private fun ActionRow(
         CurrentModelDropDown(
             availableModels = availableModels,
             getCurrentModel = onSelectModel,
-            modifier = Modifier
+            modifier = Modifier.width(150.dp)
         )
     }
 }
 
+private fun takePhoto(
+    controller: LifecycleCameraController,
+    context: Context,
+    onPhotoTaken: (Bitmap) -> Unit
+) {
+    controller.takePicture(
+        ContextCompat.getMainExecutor(context),
+        object : ImageCapture.OnImageCapturedCallback() {
+            override fun onCaptureSuccess(image: ImageProxy) {
+                super.onCaptureSuccess(image)
+
+                val matrix = Matrix().apply {
+                    postRotate(image.imageInfo.rotationDegrees.toFloat())
+                }
+                val rotatedBitmap = Bitmap.createBitmap(
+                    image.toBitmap(),
+                    0,
+                    0,
+                    image.width,
+                    image.height,
+                    matrix,
+                    true
+                )
+
+                onPhotoTaken(rotatedBitmap)
+            }
+
+            override fun onError(exception: ImageCaptureException) {
+                super.onError(exception)
+                Log.e("Camera", "Couldn't take photo: ", exception)
+            }
+        }
+    )
+}

@@ -2,8 +2,8 @@ package com.saber.aiintegration.utils
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.saber.aiintegration.domain.Classification
-import com.saber.aiintegration.domain.LandmarkClassifier
+import com.saber.aiintegration.domain.classification.Classification
+import com.saber.aiintegration.domain.classification.LandmarkClassifier
 
 class LandmarkImageAnalyzer(
     private val classifier: LandmarkClassifier,

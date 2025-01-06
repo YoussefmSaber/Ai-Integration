@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import android.view.Surface
-import com.saber.aiintegration.domain.Classification
-import com.saber.aiintegration.domain.LandmarkClassifier
+import com.saber.aiintegration.domain.classification.Classification
+import com.saber.aiintegration.domain.classification.LandmarkClassifier
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.core.BaseOptions

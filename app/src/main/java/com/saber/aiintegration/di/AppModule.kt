@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Room
 import com.saber.aiintegration.data.datasource.LandmarksDatabase
 import com.saber.aiintegration.data.manager.ModelManager
+import com.saber.aiintegration.domain.repository.LandmarksRepository
+import com.saber.aiintegration.domain.usecases.GetLandmarksUseCase
+import com.saber.aiintegration.domain.usecases.InsertLandmarkUseCase
 import com.saber.aiintegration.presentation.viewmodels.LandmarkClassifierViewModel
-import org.koin.core.context.GlobalContext.get
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
@@ -30,5 +32,15 @@ val appModule = module {
             LandmarksDatabase::class.java,
             "landmarks_database"
         ).build()
+    }
+
+    single {
+        LandmarksRepository(get())
+    }
+    single {
+        GetLandmarksUseCase(get())
+    }
+    single {
+        InsertLandmarkUseCase(get())
     }
 }
