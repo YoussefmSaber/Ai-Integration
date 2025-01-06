@@ -10,6 +10,7 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -44,6 +47,7 @@ import com.saber.aiintegration.domain.classification.Classification
 import com.saber.aiintegration.presentation.componants.CameraPreview
 import com.saber.aiintegration.presentation.componants.CurrentModelDropDown
 import com.saber.aiintegration.presentation.componants.DetectedLandmarkTitle
+import com.saber.aiintegration.presentation.componants.GeneralTopBar
 import com.saber.aiintegration.presentation.viewmodels.LandmarkClassifierViewModel
 import com.saber.aiintegration.utils.LandmarkImageAnalyzer
 import com.saber.aiintegration.utils.icons.Iconly
@@ -54,7 +58,10 @@ import org.koin.core.parameter.parametersOf
 
 
 @Composable
-fun LandmarkClassifierScreen(context: Context = LocalContext.current) {
+fun LandmarkClassifierScreen(
+    context: Context = LocalContext.current,
+    onBackClick: () -> Unit
+) {
     // ViewModel and dependencies
     val viewModel: LandmarkClassifierViewModel =
         koinViewModel(parameters = { parametersOf(context) })
@@ -84,31 +91,45 @@ fun LandmarkClassifierScreen(context: Context = LocalContext.current) {
     }
 
     // Main Layout
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        InstructionsText()
-        Spacer(Modifier.height(32.dp))
-        CameraPreview(controller = controller, modifier = Modifier.cameraPreviewStyle())
-        Spacer(Modifier.height(32.dp))
-        DetectedLandmarkTitle(classification.firstOrNull()?.label ?: "No landmark detected")
-        Spacer(Modifier.height(32.dp))
-        ActionRow(
-            availableModels = availableModels,
-            onSelectModel = { model -> viewModel.selectModel(model) },
-            onPhotoClick = {
-                takePhoto(controller, context) { bitmap ->
-                    viewModel.saveLandmark("Landmark", bitmap)
-
+    Scaffold(
+        topBar = {
+            GeneralTopBar(
+                title = "",
+                isNavigationIcon = true,
+                onCLickCallBack = onBackClick
+            )
+        },
+        containerColor = Color.White
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            InstructionsText()
+            Spacer(Modifier.height(32.dp))
+            CameraPreview(controller = controller, modifier = Modifier.cameraPreviewStyle())
+            Spacer(Modifier.height(32.dp))
+            DetectedLandmarkTitle(classification.firstOrNull()?.label ?: "No landmark detected")
+            Spacer(Modifier.height(32.dp))
+            ActionRow(
+                availableModels = availableModels,
+                onSelectModel = { model -> viewModel.selectModel(model) },
+                onPhotoClick = {
+                    takePhoto(controller, context) { bitmap ->
+                        classification.firstOrNull()?.label?.let {
+                            viewModel.saveLandmark(it, bitmap)
+                            onBackClick()
+                        }
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
+
 
 @Composable
 private fun InstructionsText() {

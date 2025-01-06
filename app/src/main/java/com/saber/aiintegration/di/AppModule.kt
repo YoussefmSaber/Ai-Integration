@@ -7,6 +7,7 @@ import com.saber.aiintegration.data.manager.ModelManager
 import com.saber.aiintegration.domain.repository.LandmarksRepository
 import com.saber.aiintegration.domain.usecases.GetLandmarksUseCase
 import com.saber.aiintegration.domain.usecases.InsertLandmarkUseCase
+import com.saber.aiintegration.presentation.viewmodels.HomeViewModel
 import com.saber.aiintegration.presentation.viewmodels.LandmarkClassifierViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.parameter.parametersOf
@@ -17,9 +18,8 @@ val appModule = module {
     // Provide the ModelManager as a singleton
     single { (context: Context) -> ModelManager(context) }
 
-    // Provide the ViewModel
-    viewModel { (context: Context) ->
-        LandmarkClassifierViewModel(get { parametersOf(context) })
+    single {
+        LandmarksRepository(get())
     }
 
     single {
@@ -35,12 +35,19 @@ val appModule = module {
     }
 
     single {
-        LandmarksRepository(get())
-    }
-    single {
         GetLandmarksUseCase(get())
     }
     single {
         InsertLandmarkUseCase(get())
     }
+
+    viewModel {
+        HomeViewModel(get())
+    }
+
+    // Provide the ViewModel
+    viewModel { (context: Context) ->
+        LandmarkClassifierViewModel(get { parametersOf(context) }, get())
+    }
+
 }

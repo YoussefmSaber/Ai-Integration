@@ -41,12 +41,12 @@ fun Modifier.fadingEdge(brush: Brush) = this
         drawRect(brush = brush, blendMode = BlendMode.Darken, alpha = 0.5F)
     }
 
-fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+fun Bitmap.bitmapToByteArray(): ByteArray {
     val stream = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream) // Or JPEG, based on your preference
+    this.compress(Bitmap.CompressFormat.PNG, 100, stream) // Or JPEG, based on your preference
     return stream.toByteArray()
 }
 
-fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
-    return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+fun ByteArray.byteArrayToBitmap(): Bitmap {
+    return BitmapFactory.decodeByteArray(this, 0, this.size)
 }

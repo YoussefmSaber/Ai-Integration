@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.compose.rememberNavController
+import com.saber.aiintegration.presentation.navigation.ApplicationNavigation
+import com.saber.aiintegration.presentation.screens.HomeScreen
 import com.saber.aiintegration.presentation.screens.LandmarkClassifierScreen
 import com.saber.aiintegration.ui.theme.AiIntegrationTheme
 
@@ -27,9 +30,10 @@ class MainActivity : ComponentActivity() {
             )
         }
         setContent {
+            val navController = rememberNavController()
             AiIntegrationTheme() {
                 Column(Modifier.fillMaxSize()) {
-                    LandmarkClassifierScreen(applicationContext)
+                    ApplicationNavigation(navController)
                 }
             }
         }

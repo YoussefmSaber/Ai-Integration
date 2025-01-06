@@ -35,7 +35,7 @@ class LandmarkClassifierViewModel(
     }
 
     fun saveLandmark(landmarkTitle: String, landmarkImage: Bitmap) {
-        val imageByteArray = bitmapToByteArray(landmarkImage)
+        val imageByteArray = landmarkImage.bitmapToByteArray()
         val landmark = LandmarkEntity(
             id = 0,
             landmarkName = landmarkTitle,
