@@ -51,18 +51,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             AiIntegrationTheme() {
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    containerColor = Color.White
-                ) { innerPadding ->
-                    Column(
-                        Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    ) {
-                        OnboardingScreen()
-                    }
+
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                ) {
+                    HomeScreen()
                 }
+
 //                    var classification by remember {
 //                        mutableStateOf(emptyList<Classification>())
 //                    }

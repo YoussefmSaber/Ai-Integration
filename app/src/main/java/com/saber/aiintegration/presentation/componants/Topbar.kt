@@ -7,6 +7,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,8 +23,10 @@ fun GeneralTopBar(
     isNavigationIcon: Boolean = false,
     isSettingsIcon: Boolean = false,
     onCLickCallBack: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     CenterAlignedTopAppBar(
+        modifier = modifier,
         colors = TopAppBarColors(
             scrolledContainerColor = Transparent,
             titleContentColor = Black,
