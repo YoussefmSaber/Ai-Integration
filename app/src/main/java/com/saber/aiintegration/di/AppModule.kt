@@ -5,6 +5,7 @@ import com.saber.aiintegration.data.datasource.LandmarksDatabase
 import org.koin.dsl.module
 
 val appModule = module {
+
     single {
         get<LandmarksDatabase>().landmarkDao()
     }
@@ -16,6 +17,4 @@ val appModule = module {
             "landmarks_database"
         ).build()
     }
-
-
 }

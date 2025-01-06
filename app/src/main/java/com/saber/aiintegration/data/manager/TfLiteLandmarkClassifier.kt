@@ -1,4 +1,4 @@
-package com.saber.aiintegration.data
+package com.saber.aiintegration.data.manager
 
 import android.content.Context
 import android.graphics.Bitmap
