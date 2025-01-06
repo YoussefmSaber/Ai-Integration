@@ -15,12 +15,24 @@ import org.tensorflow.lite.task.vision.classifier.ImageClassifier
 class TfLiteLandmarkClassifier(
     private val context: Context,
     private val threshold: Float = 0.6f,
-    private val maxResult: Int = 3
+    private val maxResult: Int = 1
 ) : LandmarkClassifier {
 
     private var classifier: ImageClassifier? = null
+    private var currentModel: String? = null
 
-    private fun setupClassifier() {
+    private val models = mapOf(
+        "Europe" to "landmarks-europe.tflite",
+        "Asia" to "landmarks-asia.tflite",
+        "Africa" to "landmarks-africa.tflite",
+        "North America" to "landmarks-north-america.tflite",
+        "South America" to "landmarks-south-america.tflite",
+        "Oceania" to "landmarks-oceania-antarctica.tflite",
+    )
+
+    private fun setupClassifier(model: String) {
+        if (classifier != null && currentModel == model) return
+
         val baseOptions = BaseOptions.builder()
             .setNumThreads(2)
             .build()
@@ -33,7 +45,7 @@ class TfLiteLandmarkClassifier(
         try {
             classifier = ImageClassifier.createFromFileAndOptions(
                 context,
-                "landmarks-europe.tflite",
+                model,
                 options
             )
 
@@ -42,10 +54,9 @@ class TfLiteLandmarkClassifier(
         }
     }
 
-    override fun classify(bitmap: Bitmap, rotation: Int): List<Classification> {
-        if (classifier == null) {
-            setupClassifier()
-        }
+    override fun classify(bitmap: Bitmap, rotation: Int, location: String): List<Classification> {
+        val modelName = models[location] ?: return emptyList()
+        setupClassifier(modelName)
 
         val imageProcessor = ImageProcessor.Builder().build()
         val tensorImage = imageProcessor.process(TensorImage.fromBitmap(bitmap))

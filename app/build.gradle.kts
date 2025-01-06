@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -42,7 +43,9 @@ android {
 // Compile time check
 ksp {
     arg("KOIN_CONFIG_CHECK", "true")
+    arg("ROOM_CONFIG_CHECK", "true")
 }
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -61,18 +64,33 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
+    // CameraX
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.video)
-
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.extensions)
 
+    // TensorFlow Lite
     implementation(libs.tensorflow.lite.task.vision)
     implementation(libs.tensorflow.lite.gpu.delegate.plugin)
     implementation(libs.tensorflow.lite.gpu)
+
+
+    // Navigation
+    implementation(libs.navigation.compose)
+
+    // Constraint Layout
+    implementation(libs.androidx.constraintlayout.compose)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    // Kotlin serialization
+    implementation(libs.kotlinx.serialization.json)
 
     // Koin
     implementation(libs.koin.androidx.compose)
