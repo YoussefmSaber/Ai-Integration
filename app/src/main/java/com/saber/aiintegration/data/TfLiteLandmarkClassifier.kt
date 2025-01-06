@@ -14,6 +14,7 @@ import org.tensorflow.lite.task.vision.classifier.ImageClassifier
 
 class TfLiteLandmarkClassifier(
     private val context: Context,
+    private val modelManager: ModelManager,
     private val threshold: Float = 0.6f,
     private val maxResult: Int = 1
 ) : LandmarkClassifier {
@@ -22,17 +23,38 @@ class TfLiteLandmarkClassifier(
     private var currentModel: String? = null
 
     private val models = mapOf(
-        "Europe" to "landmarks-europe.tflite",
-        "Asia" to "landmarks-asia.tflite",
-        "Africa" to "landmarks-africa.tflite",
-        "North America" to "landmarks-north-america.tflite",
-        "South America" to "landmarks-south-america.tflite",
-        "Oceania" to "landmarks-oceania-antarctica.tflite",
+        "Europe" to "https://drive.google.com/file/d/1BNRTjgMbEJYQ0dDRWJpNj8ChDWUWqmfj/view?usp=sharing",
+        "Asia" to "https://drive.google.com/file/d/1N6ol2Rj1PhC5dsv9Dumznx6Va_CZtc5S/view?usp=sharing",
+        "Africa" to "https://drive.google.com/file/d/1Gvwq5aOI1vr0CCvfiB0NidsXcC2ptD8C/view?usp=sharing",
+        "North America" to "https://drive.google.com/file/d/1hSvrBH5Ysi9g5sbfQkZk7aWBHixoIfNG/view?usp=sharing",
+        "South America" to "https://drive.google.com/file/d/1Fzo15xUdFemTtxqPUUfm8OgzRjfCht7V/view?usp=sharing",
+        "Oceania" to "https://drive.google.com/file/d/1v0x1uvpsez4wQcoMRDboBSCtpDFqgpM3/view?usp=sharing",
     )
 
-    private fun setupClassifier(model: String) {
-        if (classifier != null && currentModel == model) return
+    private fun setupClassifier(modelName: String, onDownloadComplete: (Boolean) -> Unit) {
+        val modelPath = modelManager.getModelPath(modelName)
 
+        if (modelPath != null) {
+            loadModel(modelPath.absolutePath)
+            onDownloadComplete(true)
+            return
+        }
+
+        val modelUrl = models[modelName] ?: return onDownloadComplete(false)
+
+        modelManager.downloadModel(modelName, modelUrl) { success ->
+            if (success) {
+                val downloadedModelPath = modelManager.getModelPath(modelName)?.absolutePath
+                if (downloadedModelPath != null) {
+                    loadModel(downloadedModelPath)
+                    onDownloadComplete(true)
+                }
+                onDownloadComplete(true)
+            }
+        }
+    }
+
+    private fun loadModel(modelPath: String) {
         val baseOptions = BaseOptions.builder()
             .setNumThreads(2)
             .build()
@@ -43,20 +65,25 @@ class TfLiteLandmarkClassifier(
             .build()
 
         try {
+            classifier?.close()
             classifier = ImageClassifier.createFromFileAndOptions(
                 context,
-                model,
+                modelPath,
                 options
             )
+            currentModel = modelPath
 
         } catch (e: IllegalStateException) {
             e.printStackTrace()
         }
     }
 
-    override fun classify(bitmap: Bitmap, rotation: Int, location: String): List<Classification> {
-        val modelName = models[location] ?: return emptyList()
-        setupClassifier(modelName)
+    override fun classify(
+        bitmap: Bitmap,
+        rotation: Int,
+        location: String
+    ): List<Classification> {
+        if (classifier == null || currentModel == null) return emptyList()
 
         val imageProcessor = ImageProcessor.Builder().build()
         val tensorImage = imageProcessor.process(TensorImage.fromBitmap(bitmap))
