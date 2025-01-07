@@ -41,7 +41,6 @@ fun TakenImageItem(
                     )
                 )
                 .size(350.dp)
-                .rotate(90f)
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
