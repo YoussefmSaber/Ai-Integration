@@ -13,6 +13,7 @@ GeoGlimpse is an innovative Android application that uses AI to recognize landma
 ## Tech Stack
 
 - **Programming Language**: Kotlin
+- **UI**: Jetpack Compose
 - **Architecture**: MVVM (Model-View-ViewModel)
 - **AI Library**: TensorFlow Lite
 - **Dependency Injection**: Koin
