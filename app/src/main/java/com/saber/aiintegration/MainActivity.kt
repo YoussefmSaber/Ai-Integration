@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             AiIntegrationTheme() {
                 Column(Modifier.fillMaxSize()) {
-                    ApplicationNavigation(navController)
+                    ApplicationNavigation(navController, this@MainActivity)
                 }
             }
         }
