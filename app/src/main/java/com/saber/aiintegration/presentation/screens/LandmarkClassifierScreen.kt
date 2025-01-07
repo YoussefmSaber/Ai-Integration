@@ -27,6 +27,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +42,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.saber.aiintegration.data.manager.ModelManager
 import com.saber.aiintegration.data.manager.TfLiteLandmarkClassifier
 import com.saber.aiintegration.domain.classification.Classification
 import com.saber.aiintegration.presentation.componants.CameraPreview
@@ -50,6 +50,8 @@ import com.saber.aiintegration.presentation.componants.DetectedLandmarkTitle
 import com.saber.aiintegration.presentation.componants.GeneralTopBar
 import com.saber.aiintegration.presentation.viewmodels.LandmarkClassifierViewModel
 import com.saber.aiintegration.utils.LandmarkImageAnalyzer
+import com.saber.aiintegration.utils.MODELS
+import com.saber.aiintegration.utils.REGION_LIST
 import com.saber.aiintegration.utils.icons.Iconly
 import com.saber.aiintegration.utils.icons.iconly.Camera
 import org.koin.androidx.compose.koinViewModel
@@ -65,19 +67,20 @@ fun LandmarkClassifierScreen(
     // ViewModel and dependencies
     val viewModel: LandmarkClassifierViewModel =
         koinViewModel(parameters = { parametersOf(context) })
-    val modelManager: ModelManager = koinInject { parametersOf(context) }
+    val landmarkClassifier: TfLiteLandmarkClassifier = koinInject { parametersOf(context) }
 
-    // Observables
-    val availableModels by viewModel.availableModels.collectAsState()
     val selectedModel by viewModel.selectedModel.collectAsState()
 
+    LaunchedEffect(selectedModel) {
+        MODELS[selectedModel]?.let { landmarkClassifier.loadModel(it) }
+    }
     // State for classification results
     var classification by remember { mutableStateOf(emptyList<Classification>()) }
 
     // Create analyzer and controller
     val analyzer = remember(viewModel, selectedModel) {
         LandmarkImageAnalyzer(
-            classifier = TfLiteLandmarkClassifier(context, modelManager),
+            classifier = landmarkClassifier,
             location = selectedModel,
             onResults = { results -> classification = results }
         )
@@ -86,7 +89,10 @@ fun LandmarkClassifierScreen(
     val controller = remember {
         LifecycleCameraController(context).apply {
             setEnabledUseCases(CameraController.IMAGE_ANALYSIS or CameraController.IMAGE_CAPTURE)
-            setImageAnalysisAnalyzer(ContextCompat.getMainExecutor(context), analyzer)
+            setImageAnalysisAnalyzer(
+                ContextCompat.getMainExecutor(context),
+                analyzer
+            )
         }
     }
 
@@ -112,10 +118,10 @@ fun LandmarkClassifierScreen(
             Spacer(Modifier.height(32.dp))
             CameraPreview(controller = controller, modifier = Modifier.cameraPreviewStyle())
             Spacer(Modifier.height(32.dp))
-            DetectedLandmarkTitle(classification.firstOrNull()?.label ?: "No landmark detected")
+            DetectedLandmarkTitle(classification.firstOrNull()?.label ?: "")
             Spacer(Modifier.height(32.dp))
             ActionRow(
-                availableModels = availableModels,
+                availableModels = REGION_LIST,
                 onSelectModel = { model -> viewModel.selectModel(model) },
                 onPhotoClick = {
                     takePhoto(controller, context) { bitmap ->
@@ -145,6 +151,7 @@ private fun Modifier.cameraPreviewStyle(): Modifier = this
 private fun ActionRow(
     availableModels: List<String>,
     onSelectModel: (String) -> Unit,
+    defaultModel: String = availableModels.first(),
     onPhotoClick: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -161,6 +168,7 @@ private fun ActionRow(
         CurrentModelDropDown(
             availableModels = availableModels,
             getCurrentModel = onSelectModel,
+            defaultValue = defaultModel,
             modifier = Modifier.width(150.dp)
         )
     }
@@ -177,20 +185,28 @@ private fun takePhoto(
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
 
-                val matrix = Matrix().apply {
-                    postRotate(image.imageInfo.rotationDegrees.toFloat())
-                }
-                val rotatedBitmap = Bitmap.createBitmap(
-                    image.toBitmap(),
-                    0,
-                    0,
-                    image.width,
-                    image.height,
-                    matrix,
-                    true
-                )
+                try {
+                    val originalBitmap = image.toBitmap() // Convert ImageProxy to Bitmap
+                    val matrix = Matrix().apply {
+                        postRotate(image.imageInfo.rotationDegrees.toFloat())
+                    }
 
-                onPhotoTaken(rotatedBitmap)
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        originalBitmap,
+                        0,
+                        0,
+                        originalBitmap.width,
+                        originalBitmap.height,
+                        matrix,
+                        true
+                    )
+
+                    image.close() // Close the ImageProxy
+                    onPhotoTaken(rotatedBitmap)
+                } catch (e: Exception) {
+                    Log.e("Camera", "Error processing photo: ", e)
+                    image.close() // Ensure ImageProxy is closed even on failure
+                }
             }
 
             override fun onError(exception: ImageCaptureException) {

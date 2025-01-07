@@ -23,12 +23,3 @@ val MODELS = mapOf(
     "South America" to "landmarks-south-america.tflite",
     "Oceania" to "landmarks-oceania-antarctica.tflite",
 )
-
-val MODELS_URL = mapOf(
-    "Europe" to "https://drive.usercontent.google.com/u/0/uc?id=1BNRTjgMbEJYQ0dDRWJpNj8ChDWUWqmfj&export=download",
-    "Asia" to "https://drive.usercontent.google.com/u/0/uc?id=1N6ol2Rj1PhC5dsv9Dumznx6Va_CZtc5S&export=download",
-    "Africa" to "https://drive.usercontent.google.com/u/0/uc?id=1Gvwq5aOI1vr0CCvfiB0NidsXcC2ptD8C&export=download",
-    "North America" to "https://drive.usercontent.google.com/u/0/uc?id=1hSvrBH5Ysi9g5sbfQkZk7aWBHixoIfNG&export=download",
-    "South America" to "https://drive.usercontent.google.com/u/0/uc?id=1Fzo15xUdFemTtxqPUUfm8OgzRjfCht7V&export=download",
-    "Oceania" to "https://drive.usercontent.google.com/u/0/uc?id=1v0x1uvpsez4wQcoMRDboBSCtpDFqgpM3&export=download",
-)

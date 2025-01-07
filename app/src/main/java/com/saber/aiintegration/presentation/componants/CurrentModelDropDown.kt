@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CurrentModelDropDown(
     modifier: Modifier = Modifier,
-    defaultValue: String = "Europe",
+    defaultValue: String,
     availableModels: List<String>,
     getCurrentModel: (String) -> Unit = {}
 ) {

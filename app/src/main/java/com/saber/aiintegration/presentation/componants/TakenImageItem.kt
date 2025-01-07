@@ -9,9 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.saber.aiintegration.utils.fadingEdge
@@ -30,6 +32,7 @@ fun TakenImageItem(
         Image(
             bitmap = landmarkImage.asImageBitmap(),
             contentDescription = "Landmark Image",
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .clip(RoundedCornerShape(25.dp))
                 .fadingEdge(
@@ -37,6 +40,8 @@ fun TakenImageItem(
                         colors = listOf(Color.Transparent, Color.Black)
                     )
                 )
+                .size(350.dp)
+                .rotate(90f)
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)

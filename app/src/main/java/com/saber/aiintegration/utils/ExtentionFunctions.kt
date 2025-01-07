@@ -43,7 +43,7 @@ fun Modifier.fadingEdge(brush: Brush) = this
 
 fun Bitmap.bitmapToByteArray(): ByteArray {
     val stream = ByteArrayOutputStream()
-    this.compress(Bitmap.CompressFormat.PNG, 100, stream) // Or JPEG, based on your preference
+    this.compress(Bitmap.CompressFormat.JPEG, 80, stream) // Or JPEG, based on your preference
     return stream.toByteArray()
 }
 

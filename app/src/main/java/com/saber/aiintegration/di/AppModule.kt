@@ -3,13 +3,12 @@ package com.saber.aiintegration.di
 import android.content.Context
 import androidx.room.Room
 import com.saber.aiintegration.data.datasource.LandmarksDatabase
-import com.saber.aiintegration.data.manager.ModelManager
+import com.saber.aiintegration.data.manager.TfLiteLandmarkClassifier
 import com.saber.aiintegration.domain.repository.LandmarksRepository
 import com.saber.aiintegration.domain.usecases.GetLandmarksUseCase
 import com.saber.aiintegration.domain.usecases.InsertLandmarkUseCase
 import com.saber.aiintegration.presentation.viewmodels.HomeViewModel
 import com.saber.aiintegration.presentation.viewmodels.LandmarkClassifierViewModel
-import com.saber.aiintegration.presentation.viewmodels.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
@@ -17,7 +16,7 @@ import org.koin.dsl.module
 val appModule = module {
 
     // Provide the ModelManager as a singleton
-    single { (context: Context) -> ModelManager(context) }
+    single { (context: Context) -> TfLiteLandmarkClassifier(context) }
 
     single {
         LandmarksRepository(get())
@@ -48,8 +47,6 @@ val appModule = module {
 
     // Provide the ViewModel
     viewModel {(context: Context) ->
-        LandmarkClassifierViewModel(get{ parametersOf(context) }, get())
+        LandmarkClassifierViewModel(get{ parametersOf(context) })
     }
-    // Provide the SettingsViewModel with a context argument
-    viewModel { (context: Context) -> SettingsViewModel(get { parametersOf(context) }) }
 }

@@ -7,7 +7,6 @@ import androidx.navigation.compose.composable
 import com.saber.aiintegration.presentation.screens.HomeScreen
 import com.saber.aiintegration.presentation.screens.LandmarkClassifierScreen
 import com.saber.aiintegration.presentation.screens.OnboardingScreen
-import com.saber.aiintegration.presentation.screens.SettingsScreen
 
 @Composable
 fun ApplicationNavigation(navController: NavHostController) {
@@ -19,17 +18,9 @@ fun ApplicationNavigation(navController: NavHostController) {
         }
         composable<Home> {
             HomeScreen(
-                onSettingCallBack = {
-                    navController.navigate(Settings)
-                },
                 onCameraCallBack = {
                     navController.navigate(LandmarkClassifier)
                 })
-        }
-        composable<Settings> {
-            SettingsScreen {
-                navController.navigate(Home)
-            }
         }
         composable<LandmarkClassifier> {
             LandmarkClassifierScreen {

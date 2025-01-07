@@ -6,8 +6,8 @@ import com.saber.aiintegration.domain.classification.Classification
 import com.saber.aiintegration.domain.classification.LandmarkClassifier
 
 class LandmarkImageAnalyzer(
-    private val classifier: LandmarkClassifier,
-    val location: String = "Europe",
+    val classifier: LandmarkClassifier,
+    val location: String,
     private val onResults: (List<Classification>) -> Unit
 ) : ImageAnalysis.Analyzer {
 
