@@ -9,6 +9,7 @@ import com.saber.aiintegration.domain.usecases.GetLandmarksUseCase
 import com.saber.aiintegration.domain.usecases.InsertLandmarkUseCase
 import com.saber.aiintegration.presentation.viewmodels.HomeViewModel
 import com.saber.aiintegration.presentation.viewmodels.LandmarkClassifierViewModel
+import com.saber.aiintegration.presentation.viewmodels.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
@@ -46,8 +47,9 @@ val appModule = module {
     }
 
     // Provide the ViewModel
-    viewModel { (context: Context) ->
-        LandmarkClassifierViewModel(get { parametersOf(context) }, get())
+    viewModel {(context: Context) ->
+        LandmarkClassifierViewModel(get{ parametersOf(context) }, get())
     }
-
+    // Provide the SettingsViewModel with a context argument
+    viewModel { (context: Context) -> SettingsViewModel(get { parametersOf(context) }) }
 }

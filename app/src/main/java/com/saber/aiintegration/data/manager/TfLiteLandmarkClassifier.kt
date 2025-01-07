@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.Surface
 import com.saber.aiintegration.domain.classification.Classification
 import com.saber.aiintegration.domain.classification.LandmarkClassifier
+import com.saber.aiintegration.utils.MODELS_URL
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.core.BaseOptions
@@ -22,19 +23,9 @@ class TfLiteLandmarkClassifier(
     private var classifier: ImageClassifier? = null
     private var currentModel: String? = null
 
-    private val models = mapOf(
-        "Europe" to "https://drive.usercontent.google.com/u/0/uc?id=1BNRTjgMbEJYQ0dDRWJpNj8ChDWUWqmfj&export=download",
-        "Asia" to "https://drive.usercontent.google.com/u/0/uc?id=1N6ol2Rj1PhC5dsv9Dumznx6Va_CZtc5S&export=download",
-        "Africa" to "https://drive.usercontent.google.com/u/0/uc?id=1Gvwq5aOI1vr0CCvfiB0NidsXcC2ptD8C&export=download",
-        "North America" to "https://drive.usercontent.google.com/u/0/uc?id=1hSvrBH5Ysi9g5sbfQkZk7aWBHixoIfNG&export=download",
-        "South America" to "https://drive.usercontent.google.com/u/0/uc?id=1Fzo15xUdFemTtxqPUUfm8OgzRjfCht7V&export=download",
-        "Oceania" to "https://drive.usercontent.google.com/u/0/uc?id=1v0x1uvpsez4wQcoMRDboBSCtpDFqgpM3&export=download",
-    )
 
     private fun setupClassifier(modelName: String, onDownloadComplete: (Boolean) -> Unit) {
-        val modelUrl = models[modelName] ?: return onDownloadComplete(false)
-
-        modelManager.ensureModelAvailable(modelName, modelUrl) { success, modelFile ->
+        modelManager.ensureModelAvailable(modelName) { success, modelFile ->
             if (success && modelFile != null) {
                 loadModel(modelFile.absolutePath)
             }
