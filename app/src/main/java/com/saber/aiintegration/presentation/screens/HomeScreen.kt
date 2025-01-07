@@ -36,7 +36,9 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     onCameraCallBack: () -> Unit,
 ) {
+    viewModel.loadLandmarks()
     val landmarks = viewModel.landmarks.collectAsState()
+
     Scaffold(
         containerColor = Color.White,
         topBar = {

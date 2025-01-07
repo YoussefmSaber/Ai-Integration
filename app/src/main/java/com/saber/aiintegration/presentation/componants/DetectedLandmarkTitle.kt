@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,13 +33,16 @@ fun DetectedLandmarkTitle(
             .padding(horizontal = 32.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
             contentAlignment = Alignment.Center // Centers the content inside the Box
         ) {
             BasicText(
                 landmarkTitle,
                 style = TextStyle(
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
                 )
             )
         }

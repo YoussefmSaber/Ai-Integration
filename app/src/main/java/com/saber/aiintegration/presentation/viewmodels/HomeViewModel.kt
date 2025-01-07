@@ -20,7 +20,7 @@ class HomeViewModel(
         loadLandmarks()
     }
 
-    private fun loadLandmarks() {
+    fun loadLandmarks() {
         viewModelScope.launch(Dispatchers.IO) {
             _landmarks.value = getLandmarksUseCase.invoke()
         }
