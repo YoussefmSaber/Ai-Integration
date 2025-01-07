@@ -26,7 +26,6 @@ GeoGlimpse is an innovative Android application that uses AI to recognize landma
 |---------------------------------------------------------------------|-----------------------------------------------------------------------|-------------------------------------------------------------------|
 | <img src="src/onboarding.jpg" alt="Screenshot 1" width="200">       | <img src="src/request-permission.jpg" alt="Screenshot 2" width="200"> | <img src="src/no-item-home.jpg" alt="Screenshot 3" width="200">   |
 | Detected Image 1                                                    | Detected Image 2                                                      | Home with items                                                   |
-| ---------------------------------------------------------------     | ----------------------------------------------------------------      | ----------------------------------------------------------------- |
 | <img src="src/detected-image-1.jpg" alt="Screenshot 4" width="200"> | <img src="src/detected-image-2.jpg" alt="Screenshot 5" width="200">   | <img src="src/home-with-item.jpg" alt="Screenshot 6" width="200"> |
 
 ---
