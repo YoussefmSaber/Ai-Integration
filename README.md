@@ -68,7 +68,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Contact
 
 For any inquiries or support, please contact:
-- **Your Name**: [Email](youssef.mu.saber@gmail.com)
+- **Email**: youssef.mu.saber@gmail.com
 - **GitHub**: [Profile](https://github.com/YoussefmSaber)
 
 ---
