@@ -94,6 +94,8 @@ dependencies {
 
     // OkHttp
     implementation(libs.okhttp)
+    implementation("com.squareup.okio:okio:3.9.1")      // Use the latest stable version
+
 
     // Koin
     implementation(libs.koin.androidx.compose)

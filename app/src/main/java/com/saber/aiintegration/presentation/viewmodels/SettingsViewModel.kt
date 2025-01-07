@@ -1,5 +1,8 @@
 package com.saber.aiintegration.presentation.viewmodels
 
+import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import com.saber.aiintegration.data.manager.ModelManager
 import com.saber.aiintegration.utils.MODELS
@@ -19,33 +22,40 @@ class SettingsViewModel(
     private val _dialogType = MutableStateFlow<DialogType?>(null) // Type of the dialog
     val dialogType: StateFlow<DialogType?> get() = _dialogType
 
+    private val _selectedModel = MutableStateFlow<String?>(null)
+    val selectedModel: StateFlow<String?> = _selectedModel
+
+    val modelDownloadProgress: StateFlow<Float> = modelManager.downloadProgress
+
     init {
         loadDownloadedModels()
     }
 
     private fun loadDownloadedModels() {
         val models = modelManager.getDownloadedModels()
-        _availableModels.value =
-            MODELS.filter { entry -> models.contains(entry.value) }.keys.toList()
+        Log.d("Settings", "loadDownloadedModels: $models")
+        _availableModels.value = models
     }
 
     fun downloadModel(modelName: String) {
         modelManager.ensureModelAvailable(modelName, onDownloadComplete = { success, _ ->
             if (success) {
                 loadDownloadedModels()
-                dismissDialog()
             }
         })
+        loadDownloadedModels()
     }
 
-    fun showRemoveDialog() {
+    fun showRemoveDialog(modelName: String) {
         _dialogType.value = DialogType.REMOVE
         _showDialog.value = true
+        _selectedModel.value = modelName
     }
 
-    fun showDownloadDialog() {
+    fun showDownloadDialog(modelName: String) {
         _dialogType.value = DialogType.DOWNLOAD
         _showDialog.value = true
+        _selectedModel.value = modelName
     }
 
     fun dismissDialog() {

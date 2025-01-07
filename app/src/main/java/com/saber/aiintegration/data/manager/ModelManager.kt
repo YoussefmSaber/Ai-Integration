@@ -1,14 +1,19 @@
 package com.saber.aiintegration.data.manager
 
 import android.content.Context
+import com.saber.aiintegration.data.ProgressResponseBody
 import com.saber.aiintegration.utils.MODELS
 import com.saber.aiintegration.utils.MODELS_URL
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.File
 import java.io.IOException
+import okhttp3.Callback
+
 
 /**
  * Manages the models stored in the application's file directory.
@@ -18,6 +23,8 @@ import java.io.IOException
 class ModelManager(private val context: Context) {
 
     private val modelDirectory = File(context.filesDir, "models")
+    private val _downloadProgress = MutableStateFlow(0f) // Progress in percentage
+    val downloadProgress: StateFlow<Float> = _downloadProgress
 
     init {
         if (!modelDirectory.exists()) {
@@ -62,28 +69,37 @@ class ModelManager(private val context: Context) {
         modelUrl: String,
         onDownloadComplete: (Boolean) -> Unit
     ) {
-        val modelFile = File(modelDirectory, modelName)
-
-        val request = Request.Builder()
-            .url(modelUrl)
-            .build()
-
+        val modelFile = MODELS[modelName]?.let { File(modelDirectory, it) }
+        val request = Request.Builder().url(modelUrl).build()
         val okhttpClient = OkHttpClient()
-        okhttpClient.newCall(request).enqueue(object : okhttp3.Callback {
+
+        okhttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
+                _downloadProgress.value = 0f
                 onDownloadComplete(false)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (!response.isSuccessful) {
+                    _downloadProgress.value = 0f
                     onDownloadComplete(false)
                     return
                 }
 
-                modelFile.outputStream().use { output ->
-                    response.body?.byteStream()?.copyTo(output)
+                val responseBody = response.body ?: return
+                val progressResponseBody =
+                    ProgressResponseBody(responseBody) { bytesRead, contentLength ->
+                        if (contentLength > 0) { // Prevent division by zero
+                            _downloadProgress.value = (bytesRead.toFloat() / contentLength) * 100
+                        }
+                    }
+
+                modelFile?.outputStream()?.use { output ->
+                    progressResponseBody.byteStream().copyTo(output)
                 }
+
+                _downloadProgress.value = 100f
                 onDownloadComplete(true)
             }
         })
